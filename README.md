@@ -110,7 +110,7 @@ npm start
 
 ## Usage
 
-1. Open browser at: http://localhost:3000
+1. Open browser at: Not Live now (I will update this later)
 2. Register or login as a user
 3. Create a support ticket
 4. Track status and SLA timer
@@ -192,9 +192,3 @@ Satyam Kumar Jha
 
 ---
 
-## Notes for Viva
-
-* Explain bcrypt workflow (hash + compare)
-* Be clear about SLA timer logic
-* Understand API flow: Route → Controller → Model → DB
-* Know difference between authentication and authorization
