@@ -1,0 +1,26 @@
+name: Seed MongoDB Atlas Database
+on:
+  workflow_dispatch:  # Manual trigger only — don't auto-seed on every push
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run Seeders
+        working-directory: ./backend
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          node seedAllDepartments.js
+          node seedWarden.js
+          node seedHigherAuthority.js

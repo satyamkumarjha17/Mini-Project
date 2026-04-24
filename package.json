@@ -1,0 +1,9 @@
+{
+  "name": "student-complaint-system-monolithic",
+  "version": "1.0.0",
+  "description": "CU Student Support Portal - Production Build",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js"
+  }
+}
