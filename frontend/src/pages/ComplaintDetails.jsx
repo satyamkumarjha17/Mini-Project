@@ -5,7 +5,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Send, ArrowLeft, Clock, User, Building, MessageSquare, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 
-const SOCKET_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin;
+const SOCKET_URL = import.meta.env.VITE_API_URL;
 
 const ComplaintDetails = () => {
   const { id } = useParams();

@@ -1,8 +1,8 @@
-# CU Student Support Portal — Setup Guide
+# CU Student Support Portal — Setup Guide (UPDATED)
 
 ## Step 1: Fix Your MongoDB Atlas (CRITICAL — Do This First)
 
-Your database has a broken index from failed seed runs. Fix it before anything else:
+Your database may have a broken index from failed seed runs. Fix it before anything else:
 
 1. Open MongoDB Atlas → your cluster → **Browse Collections**
 2. Open the `student-management` database → `users` collection
@@ -28,10 +28,10 @@ PORT=5000
 ### How to get Gmail App Password (FREE — required for OTP emails):
 1. Go to your Google Account → **Security**
 2. Enable **2-Step Verification** if not already enabled
-3. Search for **"App passwords"** in the search bar
+3. Search for **"App passwords"**
 4. Create a new App Password → select "Mail" and "Windows Computer"
 5. Copy the 16-character password → paste as `SMTP_PASS`
-6. Use your full Gmail address as `SMTP_USER`
+6. Use your Gmail address as `SMTP_USER`
 
 ---
 
@@ -54,7 +54,6 @@ All seeded accounts use password: `Password@123`
 - Hostel: `hostel@cumail.in`
 - Food: `food@cumail.in`
 - Security: `security@cumail.in`
-- (see seeders for full list)
 
 ### Higher Authority accounts:
 - `head.dsw@cumail.in`, `head.it@cumail.in`, etc.
@@ -76,23 +75,86 @@ npm install
 npm run dev
 ```
 
-Open: http://localhost:5173
+Open: http://locallhost:5173
 
 ---
 
-## Step 5: Deploy to Render (FREE)
+## Step 5: Fix Frontend API (IMPORTANT — REQUIRED FOR DEPLOYMENT)
 
-1. Push your code to GitHub (make sure `.env` is in `.gitignore` ✅)
-2. Go to [render.com](https://render.com) → New Web Service
+
+### 
+
+```js
+const API = import.meta.env.VITE_API_URL;
+```
+
+---
+
+### ✅ Example usage:
+
+```js
+const API = import.meta.env.VITE_API_URL;
+
+fetch(`${API}/api/auth/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+});
+```
+
+---
+
+## Step 6: Deploy Backend to Render (FREE)
+
+1. Push your code to GitHub (`.env` must be in `.gitignore`)
+2. Go to Render → **New Web Service**
 3. Connect your GitHub repo
-4. Set **Build Command**: `npm run build`
-5. Set **Start Command**: `npm start`
-6. Under **Environment Variables**, add all 4 variables manually:
-   - `MONGODB_URI`
-   - `JWT_SECRET`
-   - `SMTP_USER`
-   - `SMTP_PASS`
-7. Deploy!
+
+### Settings:
+
+- Root Directory: `backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+
+### Add Environment Variables:
+
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `SMTP_USER`
+- `SMTP_PASS`
+
+Deploy!
+
+---
+
+## Step 7: Deploy Frontend to Render (FREE)
+
+1. Go to Render → **New Static Site**
+2. Connect your GitHub repo
+
+### Settings:
+
+- Root Directory: `frontend`
+- Build Command: `npm install && npm run build`
+- Publish Directory: `dist`
+
+### Add Environment Variable:
+
+```
+VITE_API_URL=https://cu-student-support-portal.onrender.com
+```
+
+Deploy!
+
+---
+
+## Final Architecture
+
+Frontend (Render Static Site)
+        ↓
+Backend (Render Web Service)
+        ↓
+MongoDB Atlas
 
 ---
 
@@ -100,23 +162,23 @@ Open: http://localhost:5173
 
 | # | File | Fix |
 |---|------|-----|
-| 1 | `User.js` | Added `designation` field; removed email validator that broke upserts |
-| 2 | All seeders | Fixed `null` uid crash with `$set`, `returnDocument`, and pre-cleanup |
-| 3 | `emailService.js` | Removed hardcoded credentials; fails loudly if env vars missing |
-| 4 | `authController.js` | Removed JWT fallback secret; consistent `signToken` helper |
-| 5 | `authMiddleware.js` | Uses same JWT secret path; no fallback |
-| 6 | `authController.js` | Email domain validation moved to code (not schema); works with upserts |
-| 7 | `complaintController.js` | `higher_authority` sees escalated complaints; status validation added |
-| 8 | `chatHandler.js` | JWT authentication on every socket connection; senderId from token |
-| 9 | `server.js` | Crashes loudly if `MONGODB_URI` missing instead of silently failing |
-| 10 | `AuthContext.jsx` | Removed hardcoded `localhost` baseURL override inside component |
-| 11 | `Login.jsx` | OTP login uses `navigate()` instead of `window.location.href` |
-| 12 | `Register.jsx` | Passes `type` to OTP endpoint for email domain validation |
-| 13 | `ComplaintForm.jsx` | Replaced `prompt()` with inline text input for custom department |
-| 14 | `ComplaintDetails.jsx` | Socket sends JWT token; connected badge reflects real socket state |
-| 15 | `ManagementDashboard.jsx` | `higher_authority` UI label and escalated row highlighting |
-| 16 | `render.yaml` | Credentials removed; uses `sync: false` (enter in Render dashboard) |
-| 17 | `seed-db.yml` | Changed to manual trigger only; uses GitHub Secrets for MONGODB_URI |
-| 18 | `index.html` | Title changed from "frontend" to "CU Student Support Portal" |
-| 19 | `App.jsx` | Added catch-all `*` route redirect |
-| 20 | `ForgotPassword.jsx` | Added password confirmation field; cleaner error messages |
+| 1 | `User.js` | Added `designation`; fixed schema issues |
+| 2 | Seeders | Fixed null uid crash |
+| 3 | `emailService.js` | Removed hardcoded credentials |
+| 4 | `authController.js` | Consistent JWT handling |
+| 5 | `authMiddleware.js` | Unified JWT usage |
+| 6 | Validation | Email validation moved to controller |
+| 7 | `complaintController.js` | Higher authority visibility fix |
+| 8 | `chatHandler.js` | JWT socket authentication |
+| 9 | `server.js` | Crash if DB not connected |
+| 10 | `AuthContext.jsx` | Removed locallhost override |
+| 11 | `Login.jsx` | Proper navigation fix |
+| 12 | `Register.jsx` | OTP validation improved |
+| 13 | `ComplaintForm.jsx` | UI improvement |
+| 14 | `ComplaintDetails.jsx` | Socket auth fix |
+| 15 | `ManagementDashboard.jsx` | UI improvements |
+| 16 | `render.yaml` | Removed secrets |
+| 17 | `seed-db.yml` | Manual trigger |
+| 18 | `index.html` | Title updated |
+| 19 | `App.jsx` | Catch-all route added |
+| 20 | `ForgotPassword.jsx` | Improved validation |

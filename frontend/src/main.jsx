@@ -4,12 +4,11 @@ import axios from 'axios'
 import './index.css'
 import App from './App.jsx'
 
-// Set API base URL once here — AuthContext will not override this
-axios.defaults.baseURL = import.meta.env.VITE_API_URL ||
-  (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
+// Set API base URL (production-safe)
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
   </StrictMode>,
-)
+);
