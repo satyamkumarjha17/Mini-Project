@@ -21,10 +21,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 
 // Serve frontend in production
-const frontendDistPath = path.join(__dirname, '../frontend/dist');
-app.use(express.static(frontendDistPath));
-app.use((req, res) => {
-  res.sendFile(path.resolve(frontendDistPath, 'index.html'));
+// const frontendDistPath = path.join(__dirname, '../frontend/dist');
+// app.use(express.static(frontendDistPath));
+// app.use((req, res) => {
+//   res.sendFile(path.resolve(frontendDistPath, 'index.html'));
+// });
+app.get("/", (req, res) => {
+  res.send("Backend is running");
 });
 
 // Socket.io
